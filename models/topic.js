@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const topicSchema = new Schema ({
-    title: {String, required: true},
-    message: {String, required: true},
-    category: {String, enum: ['lifestyle', 'gaming', 'sport', 'food', 'random', 'fun', 'dev', 'UX-UI']},
-    user: {type: [Schema.Types.ObjectId], ref: 'User'},
-    comments: {type: [Schema.Types.ObjectId], ref: 'Comments'},
-    upVote: 0,
-    downVote: 0
+    title: {type: String, required: true},
+    message: {type: String, required: true},
+    category: {type: String, enum: ['lifestyle', 'gaming', 'sport', 'food', 'random', 'fun', 'dev', 'UX-UI']},
+    creator: {type: Schema.Types.ObjectId, ref: 'User'},
+    comments: {type: Schema.Types.ObjectId, ref: 'Comments'},
+    upVote: Number,
+    downVote: Number
 }, {
     timestamps: {
         createdAt: 'created_at',

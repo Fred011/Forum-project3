@@ -7,9 +7,9 @@ const userSchema = new Schema({
   username: String,
   description: String,
   picture: String,
-  topics: {type: Schema.Types.ObjectId, ref: 'Topic'},
-  comments: {type: Schema.Types.ObjectId, ref: 'Comments'},
-  favorites: {type: Schema.Types.ObjectId, ref: 'Topic'}
+  topics: [{type: Schema.Types.ObjectId, ref: 'Topic'}],
+  comments: [{type: Schema.Types.ObjectId, ref: 'Comments'}],
+  favorites: [{type: Schema.Types.ObjectId, ref: 'Topic'}]
 }, {
   timestamps: {
     createdAt: 'created_at',

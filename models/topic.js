@@ -6,7 +6,7 @@ const topicSchema = new Schema ({
     message: {type: String, required: true},
     category: {type: String, enum: ['lifestyle', 'gaming', 'sport', 'food', 'random', 'fun', 'dev', 'UX-UI']},
     creator: {type: Schema.Types.ObjectId, ref: 'User'},
-    comments: [{type: Schema.Types.ObjectId, ref: 'Comments'}],
+    comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
     upVote: Number,
     downVote: Number
 }, {

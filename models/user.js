@@ -8,7 +8,7 @@ const userSchema = new Schema({
   description: String,
   picture: String,
   topics: [{type: Schema.Types.ObjectId, ref: 'Topic'}],
-  comments: [{type: Schema.Types.ObjectId, ref: 'Comments'}],
+  comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
   favorites: [{type: Schema.Types.ObjectId, ref: 'Topic'}]
 }, {
   timestamps: {

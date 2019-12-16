@@ -192,6 +192,7 @@ router.post('/topic/:id/comment', isLoggedIn, (req, res, next) => {
     })
 });
 
+
 // PUT '/mytopics/:id/edit'   => to update one topic 
 router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
     
@@ -264,6 +265,7 @@ router.put('/profile/:id/edit', isLoggedIn, (req, res, next) => {
 })
 
 
+// DELETE => to delete your topic
 router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
     
     const userId = req.session.currentUser._id
@@ -297,6 +299,7 @@ router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
 });
 
 
+// DELETE => to delete your profile
 router.delete('/profile/:id/delete', isLoggedIn, async (req, res, next) => {
     
     const user = req.session.currentUser._id
@@ -312,6 +315,7 @@ router.delete('/profile/:id/delete', isLoggedIn, async (req, res, next) => {
         .json(err)
     }
 })
+
 
 // GET '/home'		 => to get all the topics in home
 router.get('/home', isLoggedIn, (req, res, next) => {

@@ -16,23 +16,22 @@ const { isLoggedIn } = require('../helpers/middlewares');
 // POST '/addtopic'    => to post a new topic
 router.post('/addtopic', isLoggedIn, (req, res, next) => {
     
+    console.log('hello from the backend',req.body);
     const user = req.session.currentUser
     const { title, message, category } = req.body;
     
-    
-    Topic.create({ title, message, creator: user, category, upVote: 0, downVote: 0 })
+    Topic.create({ title, message, creator: user, category })
     .then((newTopic)=> {
-        // console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡ add topic ¡¡¡¡¡¡¡¡¡¡¡¡', newTopic);
+        console.log('TOPIC', newTopic);
         res
         .status(201)
         .json(newTopic);
-        
         User.findByIdAndUpdate( user, { $push: { topics: newTopic }}, {new: true}) 
         .then( (response) => {
             console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', response)
             
         })
-        .catch( (err) => console.log(err));
+        .catch( (err) => console.log('error timeeeee',err));
     })
     .catch((err)=> {
         res
@@ -77,7 +76,7 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
 // GET 'mytopics/:id'    => to get all the topics related to the authenticated user
 router.get('/mytopics/:id', isLoggedIn, async (req, res, next) => {
     
-    const { _id } = req.session.currentUser._id
+    const { userID } = req.session.currentUser._id
     // console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡', req.session.currentUser);
     const { id } = req.params
     
@@ -228,10 +227,10 @@ router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
 // GET '/profile/:id'    => Display profile page
 router.get('/profile', isLoggedIn, (req, res, next) => {
     
-    const { _id } = req.session.currentUser
-    console.log('USER IDDDDDD', _id);
+    const id = req.session.currentUser._id
+    console.log('USER IDDDDDD', id);
     
-    User.findById( _id ).populate('comments', 'topics')
+    User.findById( id ).populate('comments', 'topics')
     .then( (user) => {
         res 
         .status(200)
@@ -247,22 +246,22 @@ router.get('/profile', isLoggedIn, (req, res, next) => {
 
 
 // PUT '/profile/:id/edit'     => edit user profile
-router.put('/profile/:id/edit', isLoggedIn, (req, res, next) => {
+router.put('/profile/edit', isLoggedIn, (req, res, next) => {
     
-    const { _id } = req.session.currentUser
+    const id = req.session.currentUser._id 
     
-    User.findByIdAndUpdate( _id, req.body)
-    .then( (user) => {
-        // console.log('USER', user);
-        res
-        .status(201)
-        .json(user)
-    })
-    .catch( (err) => {
-        res
-        .status(500)
-        .json(err)
-    });
+    User.findByIdAndUpdate( id, req.body)
+        .then( (user) => {
+            // console.log('USER', user);
+            res
+            .status(201)
+            .json(user)
+        })
+        .catch( (err) => {
+            res
+            .status(500)
+            .json(err)
+        });
 })
 
 
@@ -325,6 +324,7 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
 
     Topic.findById ( id )
     .populate('creator')
+    .populate('comments')
         .then( (topic) => {
             res 
                 .status(200)
@@ -337,6 +337,8 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
         });
     
 })
+
+
 
 
 // GET '/home'		 => to get all the topics in home

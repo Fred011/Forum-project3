@@ -73,6 +73,7 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     
 });
 
+
 // GET 'mytopics/:id'    => to get all the topics related to the authenticated user
 router.get('/mytopics/:id', isLoggedIn, async (req, res, next) => {
     
@@ -225,12 +226,12 @@ router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
 
 
 // GET '/profile/:id'    => Display profile page
-router.get('/profile/:id', isLoggedIn, (req, res, next) => {
+router.get('/profile', isLoggedIn, (req, res, next) => {
     
     const { _id } = req.session.currentUser
     console.log('USER IDDDDDD', _id);
     
-    User.findById( _id ).populate('Comment', 'Topics')
+    User.findById( _id ).populate('comments', 'topics')
     .then( (user) => {
         res 
         .status(200)
@@ -314,6 +315,27 @@ router.delete('/profile/:id/delete', isLoggedIn, async (req, res, next) => {
         .status(500)
         .json(err)
     }
+})
+
+
+// Get => to get a specific topic
+router.get('/topics/:id', isLoggedIn, (req, res, next) => {
+
+    const { id } = req.params
+
+    Topic.findById ( id )
+    .populate('creator')
+        .then( (topic) => {
+            res 
+                .status(200)
+                .json(topic)
+        })
+        .catch( (err) => {
+            res
+                .status(500)
+                .json(err)
+        });
+    
 })
 
 

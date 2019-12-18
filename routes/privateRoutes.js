@@ -152,6 +152,52 @@ router.delete('/mycomments/:id/delete', isLoggedIn, async (req, res, next) => {
 
 
 // POST '/topic/:id/comment    => to post a new comment on specific topic
+// router.post('/topic/:id/comment', isLoggedIn, async, (req, res, next) => {
+    
+//     const user = req.session.currentUser._id
+//     const { id } = req.params
+//     const { message } = req.body;
+    
+//     // const arr = id.comments.push(newComment)
+    
+//     const createComment = await Comment.create({ message, user, topic: id, upVote: 0, downVote: 0 })
+//     Topic.findByIdAndUpdate( id, { $push: { comments: newComment }}, {new: true}) 
+
+//     .then((newComment)=> {
+//         console.log('add comment works');
+//         console.log(newComment);
+//         res
+//         .status(201)
+//         .json(newComment);
+        
+//         .then( (response) => {
+//             console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', response)
+//         })
+//         .catch( (err) => {
+//             res
+//             .status(500)
+//             .json(err)
+//         });
+        
+//         User.findByIdAndUpdate(user, { $push: { comments: newComment }}, {new: true})
+//         .then( (data) => console.log(data))
+//         .catch( (err) => 
+//         res
+//         .status(500)
+//         .json(err));
+//     })
+//     .catch((err)=> {
+//         res
+//         .status(500)  // Internal Server Error
+//         .json(err)
+//     })
+// });
+
+
+
+
+
+// POST '/topic/:id/comment    => to post a new comment on specific topic
 router.post('/topic/:id/comment', isLoggedIn, (req, res, next) => {
     
     const user = req.session.currentUser._id
@@ -230,7 +276,7 @@ router.get('/profile', isLoggedIn, (req, res, next) => {
     const id = req.session.currentUser._id
     console.log('USER IDDDDDD', id);
     
-    User.findById( id ).populate('comments', 'topics')
+    User.findById( id ).populate('comments topics')
     .then( (user) => {
         res 
         .status(200)
@@ -249,8 +295,9 @@ router.get('/profile', isLoggedIn, (req, res, next) => {
 router.put('/profile/edit', isLoggedIn, (req, res, next) => {
     
     const id = req.session.currentUser._id 
+    const { username, description } = req.body;
     
-    User.findByIdAndUpdate( id, req.body)
+    User.findByIdAndUpdate( id, { username, description }, {new: true})
         .then( (user) => {
             // console.log('USER', user);
             res

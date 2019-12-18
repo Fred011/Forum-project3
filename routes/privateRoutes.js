@@ -44,8 +44,10 @@ router.post('/addtopic', isLoggedIn, (req, res, next) => {
 // GET 'myTopics'    => to get all the topics related to the authenticated user
 router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     
+    console.log('IN MY TOPICS ROUTE');
+    
     const user = req.session.currentUser._id
-    console.log('req.session.currentUSer', user);
+    // console.log('req.session.currentUSer', user);
     
     if ( !mongoose.Types.ObjectId.isValid(user) ) {
         res
@@ -57,7 +59,7 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     User.findById( user )
     .populate('topics')
     .then( (user) => {
-        console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', user.topics)
+        // console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', user.topics)
         const userTopics = user.topics
         res
         .status(200)

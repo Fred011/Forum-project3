@@ -44,10 +44,8 @@ router.post('/addtopic', isLoggedIn, (req, res, next) => {
 // GET 'myTopics'    => to get all the topics related to the authenticated user
 router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     
-    console.log('IN MY TOPICS ROUTE');
-    
     const user = req.session.currentUser._id
-    // console.log('req.session.currentUSer', user);
+    console.log('req.session.currentUSer', user);
     
     if ( !mongoose.Types.ObjectId.isValid(user) ) {
         res
@@ -59,8 +57,8 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     User.findById( user )
     .populate('topics')
     .then( (user) => {
-        // console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', user.topics)
-        const userTopics = user.topics
+        console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', user.topics)
+        userTopics = user.topics
         res
         .status(200)
         .json(userTopics);
@@ -154,52 +152,38 @@ router.delete('/mycomments/:id/delete', isLoggedIn, async (req, res, next) => {
 
 
 // POST '/topic/:id/comment    => to post a new comment on specific topic
-router.post('/topic/:id/addcomment', isLoggedIn, (req, res, next) => {
+router.post('/topic/:id/comment', isLoggedIn, (req, res, next) => {
     
     const user = req.session.currentUser._id
     const { id } = req.params
     const { message } = req.body;
-    console.log('paramssssss', req.params.id);
-    
     
     // const arr = id.comments.push(newComment)
     
-    Comment.create({ message: message, user, topic: id, upVote: 0, downVote: 0 })
-    // .populate('topic')
+    Comment.create({ message, user, topic: id, upVote: 0, downVote: 0 })
     .then((newComment)=> {
         console.log('add comment works');
-        console.log('NEW COMMENT', newComment);
-
+        console.log(newComment);
+        res
+        .status(201)
+        .json(newComment);
         
-       const firstPromise = Topic.findByIdAndUpdate( id, { $push: { comments: newComment }}, {new: true}) 
+        Topic.findByIdAndUpdate( id, { $push: { comments: newComment }}, {new: true}) 
         .then( (response) => {
-            console.log('TOPIIIIIIIIC', response)
+            console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', response)
         })
-        
         .catch( (err) => {
             res
             .status(500)
             .json(err)
         });
         
-     const secondPromise = User.findByIdAndUpdate(user, { $push: { comments: newComment }}, {new: true})
-        .then( (data) => {
-            console.log('data', data);
-        })
+        User.findByIdAndUpdate(user, { $push: { comments: newComment }}, {new: true})
+        .then( (data) => console.log(data))
         .catch( (err) => 
         res
         .status(500)
         .json(err));
-
-    Promise.all([firstPromise, secondPromise])
-    .then( () => {
-        console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡',newComment);
-        res
-        .status(201)
-        .json(newComment);  
-    })
-    .catch( (err) => console.log(err));
-
     })
     .catch((err)=> {
         res
@@ -217,7 +201,7 @@ router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
     console.log('TOPIC ID', req.params.id);
     
     User.findById( {_id}  )
-    .populate('topics')
+    .populate('Topic')
     .then( (user) => {
         // console.log('USER.TOPIC', user.topics);
         
@@ -246,9 +230,7 @@ router.get('/profile', isLoggedIn, (req, res, next) => {
     const id = req.session.currentUser._id
     console.log('USER IDDDDDD', id);
     
-    User.findById( id )
-    .populate('comments')
-    .populate('topics')
+    User.findById( id ).populate('comments', 'topics')
     .then( (user) => {
         res 
         .status(200)
@@ -285,7 +267,7 @@ router.put('/profile/edit', isLoggedIn, (req, res, next) => {
 
 // DELETE => to delete your topic
 router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
-    console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+    
     const userId = req.session.currentUser._id
     const { id } = req.params
     
@@ -358,14 +340,13 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
 
 
 
+
 // GET '/home'		 => to get all the topics in home
 router.get('/home', isLoggedIn, (req, res, next) => {
 
     console.log('USERRRRR', req.session.currentUser);
     
     Topic.find()
-    .populate('creator')
-    .populate('comments')
       .then(allTheTopics => {
           console.log('home worksssssssss');
           

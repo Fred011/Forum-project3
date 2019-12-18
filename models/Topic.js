@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const topicSchema = new Schema ({
     title: {type: String, required: true},
     message: {type: String, required: true},
-    category: {type: String, enum: ['Lifestyle', 'Gaming', 'Sport', 'Food', 'Random', 'Fun', 'Dev', 'UX-UI']},
+    category: {type: String, enum: ['Lifestyle', 'Gaming', 'Sport', 'Food', 'Random', 'Fun', 'Coding', 'UX-UI']},
     creator: {type: Schema.Types.ObjectId, ref: 'User'},
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
     upVote: Number,

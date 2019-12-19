@@ -20,7 +20,7 @@ router.post('/addtopic', isLoggedIn, (req, res, next) => {
     const user = req.session.currentUser
     const { title, message, category } = req.body;
     
-    Topic.create({ title, message, creator: user, category })
+    Topic.create({ title, message, creator: user, category, upVote: 0, downVote: 0 })
     .then((newTopic)=> {
         console.log('TOPIC', newTopic);
         res
@@ -370,8 +370,7 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
     const { id } = req.params
 
     Topic.findById ( id )
-    .populate('creator')
-    .populate('comments')
+    .populate('creator comments')
         .then( (topic) => {
             res 
                 .status(200)

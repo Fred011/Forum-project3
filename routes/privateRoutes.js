@@ -74,24 +74,26 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
 
 
 // GET 'mytopics/:id'    => to get all the topics related to the authenticated user
-router.get('/mytopics/:id', isLoggedIn, async (req, res, next) => {
+router.get('/mytopics/:id', isLoggedIn, (req, res, next) => {
     
     const { userID } = req.session.currentUser._id
-    // console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡', req.session.currentUser);
     const { id } = req.params
     
-    console.log('TOPIC ID', id);
-    
-    try {
-        const topic = await Topic.findById(id) 
+    console.log('TOPIC ID', req.params)
+
+    Topic.findById(id) 
+    .then( (topic) => {
         res
-        .status(200)
-        .json(topic)
-    } catch (err) {
+            .status(200)
+            .json(topic)
+    })
+    .catch( (err) => {
         res
         .status(500)
         .json(err)
-    }
+    });
+    
+        
 });
 
 
@@ -149,52 +151,6 @@ router.delete('/mycomments/:id/delete', isLoggedIn, async (req, res, next) => {
         
     }
 });
-
-
-// POST '/topic/:id/comment    => to post a new comment on specific topic
-// router.post('/topic/:id/comment', isLoggedIn, async, (req, res, next) => {
-    
-//     const user = req.session.currentUser._id
-//     const { id } = req.params
-//     const { message } = req.body;
-    
-//     // const arr = id.comments.push(newComment)
-    
-//     const createComment = await Comment.create({ message, user, topic: id, upVote: 0, downVote: 0 })
-//     Topic.findByIdAndUpdate( id, { $push: { comments: newComment }}, {new: true}) 
-
-//     .then((newComment)=> {
-//         console.log('add comment works');
-//         console.log(newComment);
-//         res
-//         .status(201)
-//         .json(newComment);
-        
-//         .then( (response) => {
-//             console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', response)
-//         })
-//         .catch( (err) => {
-//             res
-//             .status(500)
-//             .json(err)
-//         });
-        
-//         User.findByIdAndUpdate(user, { $push: { comments: newComment }}, {new: true})
-//         .then( (data) => console.log(data))
-//         .catch( (err) => 
-//         res
-//         .status(500)
-//         .json(err));
-//     })
-//     .catch((err)=> {
-//         res
-//         .status(500)  // Internal Server Error
-//         .json(err)
-//     })
-// });
-
-
-
 
 
 // POST '/topic/:id/comment    => to post a new comment on specific topic
@@ -389,13 +345,10 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
 
 // GET '/home'		 => to get all the topics in home
 router.get('/home', isLoggedIn, (req, res, next) => {
-
-    console.log('USERRRRR', req.session.currentUser);
     
     Topic.find()
-      .then(allTheTopics => {
-          console.log('home worksssssssss');
-          
+    .populate('comments creator')
+      .then(allTheTopics => {  
         res
             .status(200)
             .json(allTheTopics);

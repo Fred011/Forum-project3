@@ -330,8 +330,7 @@ router.patch('/favorites/add/:id', isLoggedIn, async (req, res, next) => {
 
     try {
         // const selectedTopic = await Topic.findById(id);
-        console.log('HELLO FROM BACKEND ADD FAVORITES');
-        await User.findByIdAndUpdate( userID, { $push: { favorites: id }}, {new: true}).populate('favorites');
+        await User.findByIdAndUpdate( userID, { $push: { favorites: id }}, {new: true});
         
         res 
             .status(202)

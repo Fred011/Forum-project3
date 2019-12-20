@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+  <g id="x-square" transform="translate(-2 -2)">
+    <rect id="Rectangle_39" data-name="Rectangle 39" width="18" height="18" rx="2" transform="translate(3 3)" stroke-width="2" stroke="#ff006c" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line id="Ligne_20" data-name="Ligne 20" x2="6" y2="6" transform="translate(9 9)" fill="none" stroke="#ff006c" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <line id="Ligne_21" data-name="Ligne 21" x1="6" y2="6" transform="translate(9 9)" fill="none" stroke="#ff006c" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </g>
+</svg>

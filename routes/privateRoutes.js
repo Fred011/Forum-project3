@@ -16,19 +16,17 @@ const { isLoggedIn } = require('../helpers/middlewares');
 // POST '/addtopic'    => to post a new topic
 router.post('/addtopic', isLoggedIn, (req, res, next) => {
     
-    console.log('hello from the backend',req.body);
     const user = req.session.currentUser
     const { title, message, category } = req.body;
     
     Topic.create({ title, message, creator: user, category, upVote: 0, downVote: 0 })
     .then((newTopic)=> {
-        console.log('TOPIC', newTopic);
         res
         .status(201)
         .json(newTopic);
         User.findByIdAndUpdate( user, { $push: { topics: newTopic }}, {new: true}) 
         .then( (response) => {
-            console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', response)
+            console.log('response')
             
         })
         .catch( (err) => console.log('error timeeeee',err));
@@ -45,7 +43,6 @@ router.post('/addtopic', isLoggedIn, (req, res, next) => {
 router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     
     const user = req.session.currentUser._id
-    console.log('req.session.currentUSer', user);
     
     if ( !mongoose.Types.ObjectId.isValid(user) ) {
         res
@@ -57,7 +54,6 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     User.findById( user )
     .populate('topics')
     .then( (user) => {
-        console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', user.topics)
         userTopics = user.topics
         res
         .status(200)
@@ -79,8 +75,6 @@ router.get('/mytopics/:id', isLoggedIn, (req, res, next) => {
     const { userID } = req.session.currentUser._id
     const { id } = req.params
     
-    console.log('TOPIC ID', req.params)
-
     Topic.findById(id) 
     .then( (topic) => {
         res
@@ -103,13 +97,11 @@ router.get('/mycomments', isLoggedIn, async  (req, res, next) => {
     const user = req.session.currentUser
     
     try {
-        const userComments = await User.findById( user ).populate('comments')
-        // const allMyComments = await User.find({user}).populate('comments')
+        const userObj = await User.findById( user ).populate('comments')
         
         res
         .status(200)
-        .json(userComments.comments)
-        console.log('user commentssssss', userComments.comments);
+        .json(userObj.comments)
     } catch (err) {
         res
         .status(500)  // Internal Server Error
@@ -123,9 +115,7 @@ router.delete('/mycomments/:id/delete', isLoggedIn, async (req, res, next) => {
     
     const userId = req.session.currentUser._id
     const { id } = req.params
-    
-    console.log('UPDATED USERRRRR', req.session.currentUser);
-    
+        
     if ( !mongoose.Types.ObjectId.isValid(id) ) {
         res
         .status(400)
@@ -142,9 +132,7 @@ router.delete('/mycomments/:id/delete', isLoggedIn, async (req, res, next) => {
         .status(202)
         .json({ message: `Comment with ${id} removed successfully.` })
     }
-    catch (err) {
-        console.log('ERROOOOOOOOORR', err);
-        
+    catch (err) {        
         res
         .status(500)
         .json(err)
@@ -172,7 +160,7 @@ router.post('/topic/:id/comment', isLoggedIn, (req, res, next) => {
         
         Topic.findByIdAndUpdate( id, { $push: { comments: newComment }}, {new: true}) 
         .then( (response) => {
-            console.log('¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡', response)
+            console.log('response')
         })
         .catch( (err) => {
             res
@@ -199,19 +187,16 @@ router.post('/topic/:id/comment', isLoggedIn, (req, res, next) => {
 router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
     
     const { _id } = req.session.currentUser
-    
-    console.log('TOPIC ID', req.params.id);
-    
+        
     User.findById( {_id}  )
     .populate('Topic')
     .then( (user) => {
         // console.log('USER.TOPIC', user.topics);
         
         const { id } = req.params
-        console.log('PARAMSSSSSSS', req.params);
+
         Topic.findByIdAndUpdate(id, req.body)
         .then( (topic) => {
-            console.log('???????????????', topic);
             res
             .status(201)
             .json(topic)
@@ -230,7 +215,6 @@ router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
 router.get('/profile', isLoggedIn, (req, res, next) => {
     
     const id = req.session.currentUser._id
-    console.log('USER IDDDDDD', id);
     
     User.findById( id ).populate('comments topics')
     .then( (user) => {
@@ -273,9 +257,7 @@ router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
     
     const userId = req.session.currentUser._id
     const { id } = req.params
-    
-    console.log('UPDATED USERRRRR', userId  );
-    
+        
     if ( !mongoose.Types.ObjectId.isValid(id) ) {
         res
         .status(400)
@@ -286,10 +268,8 @@ router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
     try {
         const removedTopic = await Topic.findByIdAndRemove(id);
         User.findByIdAndUpdate( userId, { $pull: { topics: id }}, {new: true}).populate('topics')
-        .then((user)=> console.log('user', user)
+        .then((user) => console.log('user', user)
         )
-        console.log('removedTopic._id', removedTopic);
-        
         res
         .status(202)
         .json({ message: `Topic with ${id} removed successfully.` })
@@ -324,13 +304,14 @@ router.delete('/profile/:id/delete', isLoggedIn, async (req, res, next) => {
 router.get('/topics/:id', isLoggedIn, (req, res, next) => {
 
     const { id } = req.params
-
+    
+    
     Topic.findById ( id )
     .populate('creator comments')
-        .then( (topic) => {
-            res 
-                .status(200)
-                .json(topic)
+    .then( (topic) => {
+        res 
+            .status(200)
+            .json(topic)
         })
         .catch( (err) => {
             res
@@ -340,6 +321,42 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
     
 })
 
+
+// PUT '/favorites  add topics to your favorites
+router.patch('/favorites/add/:id', isLoggedIn, async (req, res, next) => {
+
+    const { id } = req.params
+    const userID = req.session.currentUser
+
+    try {
+        // const selectedTopic = await Topic.findById(id);
+        console.log('HELLO FROM BACKEND ADD FAVORITES');
+        await User.findByIdAndUpdate( userID, { $push: { favorites: id }}, {new: true}).populate('favorites');
+        
+        res 
+            .status(202)
+            .json({ message: `Topic with ${id} added to favorites successfully.` })
+    } catch (error) {
+        res
+        .status(500)
+        .json(err)
+    }
+})
+
+router.get('/favorites', isLoggedIn, async (req, res, next) => {
+    const userID = req.session.currentUser
+
+    try {
+        const user = await User.findById(userID).populate('favorites')
+            res
+                .status(200)
+                .json(user.favorites)
+    } catch (error) {
+        res
+        .status(500)
+        .json(err)
+    }
+})
 
 
 

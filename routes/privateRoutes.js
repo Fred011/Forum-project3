@@ -19,7 +19,7 @@ router.post('/addtopic', isLoggedIn, (req, res, next) => {
     const user = req.session.currentUser
     const { title, message, category } = req.body;
     
-    Topic.create({ title, message, creator: user, category, upVote: 0, downVote: 0 })
+    Topic.create({ title, message, creator: user, category, vote: 0 })
     .then((newTopic)=> {
         res
         .status(201)
@@ -150,7 +150,7 @@ router.post('/topic/:id/comment', isLoggedIn, (req, res, next) => {
     
     // const arr = id.comments.push(newComment)
     
-    Comment.create({ message, user, topic: id, upVote: 0, downVote: 0 })
+    Comment.create({ message, user, topic: id, vote: 0 })
     .then((newComment)=> {
         console.log('add comment works');
         console.log(newComment);

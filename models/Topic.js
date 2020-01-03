@@ -7,8 +7,7 @@ const topicSchema = new Schema ({
     category: {type: String, enum: ['Lifestyle', 'Gaming', 'Sport', 'Food', 'Random', 'Fun', 'Coding', 'UX-UI']},
     creator: {type: Schema.Types.ObjectId, ref: 'User'},
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-    upVote: Number,
-    downVote: Number
+    vote: Number,
 }, {
     timestamps: {
         createdAt: 'created_at',

@@ -5,8 +5,7 @@ const commentSchema = new Schema ({
     message: String,
     user: {type: Schema.Types.ObjectId, ref: 'User'},
     topic: {type: Schema.Types.ObjectId, ref: 'Topic'},
-    upVote: Number,
-    downVote: Number
+    vote: Number
 }, {
     timestamps: {
         createdAt: 'created_at',

@@ -52,12 +52,11 @@ router.get('/mytopics', isLoggedIn,  (req, res, next) => {
     }
     
     User.findById( user )
-    .populate('topics')
+
     .then( (user) => {
-        userTopics = user.topics
         res
         .status(200)
-        .json(userTopics);
+        .json(user);
         
     })
     .catch((err)=> {
@@ -76,6 +75,7 @@ router.get('/mytopics/:id', isLoggedIn, (req, res, next) => {
     const { id } = req.params
     
     Topic.findById(id) 
+    .populate('comments creator')
     .then( (topic) => {
         res
             .status(200)
@@ -189,7 +189,7 @@ router.put('/mytopics/:id/edit', isLoggedIn,  (req, res) => {
     const { _id } = req.session.currentUser
         
     User.findById( {_id}  )
-    .populate('Topic')
+    .populate('topic')
     .then( (user) => {
         // console.log('USER.TOPIC', user.topics);
         
@@ -218,6 +218,7 @@ router.get('/profile', isLoggedIn, (req, res, next) => {
     
     User.findById( id ).populate('comments topics')
     .then( (user) => {
+        console.log('USERRRRRR', user)
         res 
         .status(200)
         .json(user)
@@ -251,6 +252,49 @@ router.put('/profile/edit', isLoggedIn, (req, res, next) => {
         });
 })
 
+// PUT '/topic/:id/vote         => upvote topic
+router.put('/topic/:id/vote', isLoggedIn, async (req, res, next) => {
+
+    const userId = req.session.currentUser._id
+    const { id } = req.params
+
+    try {
+        Topic.findByIdAndUpdate( id, { $inc: { vote: 1 }}, {new: true})
+        .then((vote) => console.log('upvote¡¡¡', vote)
+        )
+        res
+        .status(202)
+        .json({ message: `Topic with ${id} upVoted.` })
+    } catch (error) {
+        res
+        .status(500)
+        .json(err)
+    }
+
+})
+
+
+// PUT '/topic/:id/downvote         => downVote topic
+router.put('/topic/:id/downvote', isLoggedIn, async (req, res, next) => {
+
+    const userId = req.session.currentUser._id
+    const { id } = req.params
+
+    try {
+        Topic.findByIdAndUpdate( id, { $inc: { vote: -1 }}, {new: true})
+        .then((vote) => console.log('upvote¡¡¡', vote)
+        )
+        res
+        .status(202)
+        .json({ message: `Topic with ${id} downVoted.` })
+    } catch (error) {
+        res
+        .status(500)
+        .json(err)
+    }
+
+})
+
 
 // DELETE => to delete your topic
 router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
@@ -281,16 +325,44 @@ router.delete('/mytopics/:id/delete', isLoggedIn, async (req, res, next) => {
     }
 });
 
+// // DELETE => to delete your favorited topic
+router.patch('/topics/:id/remove', isLoggedIn, async (req, res, next) => {
+    
+    const userId = req.session.currentUser._id
+    const { id } = req.params
+        
+    if ( !mongoose.Types.ObjectId.isValid(id) ) {
+        res
+        .status(400)
+        .json({ message: 'Specified id is not valid'});
+        return;
+    }
+    
+    try {
+        User.findByIdAndUpdate( userId, { $pull: { favorites: id }}, {new: true}).populate('topics')
+        .then((user) => console.log('user', user)
+        )
+        res
+        .status(202)
+        .json({ message: `Topic with ${id} removed successfully.` })
+    }
+    catch (err) {
+        res
+        .status(500)
+        .json(err)  
+    }
+});
+
 
 // DELETE => to delete your profile
-router.delete('/profile/:id/delete', isLoggedIn, async (req, res, next) => {
+router.delete('/profile', isLoggedIn, async (req, res, next) => {
     
     const user = req.session.currentUser._id
     
     try {
         User.findByIdAndRemove( user )
         res
-        .status(204)
+        .status(205)
         .json({ message: `Profile with ${user} removed successfully.` })
     } catch (err) {
         res
@@ -307,7 +379,7 @@ router.get('/topics/:id', isLoggedIn, (req, res, next) => {
     
     
     Topic.findById ( id )
-    .populate('creator comments')
+    .populate('topics comments')
     .then( (topic) => {
         res 
             .status(200)
@@ -331,6 +403,7 @@ router.patch('/favorites/add/:id', isLoggedIn, async (req, res, next) => {
     try {
         // const selectedTopic = await Topic.findById(id);
         await User.findByIdAndUpdate( userID, { $push: { favorites: id }}, {new: true});
+        await Topic.findByIdAndUpdate( id, { $push: { favorites: userID }}, {new: true});
         
         res 
             .status(202)

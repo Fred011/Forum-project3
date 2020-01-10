@@ -9,7 +9,7 @@ const userSchema = new Schema({
   picture: String,
   topics: [{type: Schema.Types.ObjectId, ref: 'Topic'}],
   comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-  favorites: [{type: Schema.Types.ObjectId, ref: 'Topic'}]
+  favorites: [{type: Schema.Types.ObjectId, ref: 'Topic', unique: true}]
 }, {
   timestamps: {
     createdAt: 'created_at',

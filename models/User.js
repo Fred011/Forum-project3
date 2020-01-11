@@ -9,7 +9,9 @@ const userSchema = new Schema({
   picture: String,
   topics: [{type: Schema.Types.ObjectId, ref: 'Topic'}],
   comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-  favorites: [{type: Schema.Types.ObjectId, ref: 'Topic', unique: true}]
+  favorites: [{type: Schema.Types.ObjectId, ref: 'Topic'}],
+  upVotes: [{type: Schema.Types.ObjectId, ref: 'Topic'}],
+  downVotes: [{type: Schema.Types.ObjectId, ref: 'Topic'}]
 }, {
   timestamps: {
     createdAt: 'created_at',

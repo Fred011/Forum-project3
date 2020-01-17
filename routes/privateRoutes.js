@@ -60,7 +60,7 @@ router.get("/mytopics/:id", isLoggedIn, (req, res, next) => {
   const { id } = req.params;
 
   Topic.findById(id)
-    .populate("comments creator")
+    .populate("comments creator favorites")
     .then(topic => {
       res.status(200).json(topic);
     })
@@ -222,6 +222,7 @@ router.put("/topic/:id/vote", isLoggedIn, async (req, res, next) => {
       { new: true }
     )
     await User.findByIdAndUpdate(userId, { $push: {upVotes: id}}, {new: true})
+    await User.findByIdAndUpdate(userId, { $pull: {downVotes: id}}, {new: true})
     res.status(202).json({ message: `Topic with ${id} upVoted.` });
   } catch (error) {
     res.status(500).json(err);
@@ -260,6 +261,7 @@ router.put("/topic/:id/downvote", isLoggedIn, async (req, res, next) => {
     )
 
     await User.findByIdAndUpdate(userId, { $push: {downVotes: id}}, {new: true})
+    await User.findByIdAndUpdate(userId, { $pull: {upVotes: id}}, {new: true})
     res.status(202).json({ message: `Topic with ${id} downVoted.` });
   } catch (error) {
     res.status(500).json(err);

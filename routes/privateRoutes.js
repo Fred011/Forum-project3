@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 // const createError = require('http-errors');
-const Topic = require("../models/Topic");
-const Comment = require("../models/Comment");
-const User = require("../models/User");
+const Topic = require("../models/topic");
+const Comment = require("../models/comment");
+const User = require("../models/user");
 
 const { isLoggedIn } = require("../helpers/middlewares");
 

@@ -202,7 +202,7 @@ router.put("/profile/edit", isLoggedIn, (req, res, next) => {
 
   User.findByIdAndUpdate(id, { username, description }, { new: true })
     .then(user => {
-      console.log('USER', user);
+      console.log("USER", user);
       res.status(201).json(user);
     })
     .catch(err => {
@@ -216,13 +216,17 @@ router.put("/topic/:id/vote", isLoggedIn, async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    await Topic.findByIdAndUpdate(
-      id,
-      { $inc: { vote: +1 } }, 
+    await Topic.findByIdAndUpdate(id, { $inc: { vote: +1 } }, { new: true });
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { upVotes: id } },
       { new: true }
-    )
-    await User.findByIdAndUpdate(userId, { $push: {upVotes: id}}, {new: true})
-    await User.findByIdAndUpdate(userId, { $pull: {downVotes: id}}, {new: true})
+    );
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { downVotes: id } },
+      { new: true }
+    );
     res.status(202).json({ message: `Topic with ${id} upVoted.` });
   } catch (error) {
     res.status(500).json(err);
@@ -235,13 +239,13 @@ router.put("/topic/:id/cancelupvote", isLoggedIn, async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    await Topic.findByIdAndUpdate(
-      id,
-      { $inc: { vote: -1 } },
-      { new: true }
-    )
+    await Topic.findByIdAndUpdate(id, { $inc: { vote: -1 } }, { new: true });
 
-    await User.findByIdAndUpdate(userId, { $pull: {upVotes: id}}, {new: true})
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { upVotes: id } },
+      { new: true }
+    );
     res.status(202).json({ message: `Topic with ${id} downVoted.` });
   } catch (error) {
     res.status(500).json(err);
@@ -254,14 +258,18 @@ router.put("/topic/:id/downvote", isLoggedIn, async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    await Topic.findByIdAndUpdate(
-      id,
-      { $inc: { vote: -1 } },
-      { new: true }
-    )
+    await Topic.findByIdAndUpdate(id, { $inc: { vote: -1 } }, { new: true });
 
-    await User.findByIdAndUpdate(userId, { $push: {downVotes: id}}, {new: true})
-    await User.findByIdAndUpdate(userId, { $pull: {upVotes: id}}, {new: true})
+    await User.findByIdAndUpdate(
+      userId,
+      { $push: { downVotes: id } },
+      { new: true }
+    );
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { upVotes: id } },
+      { new: true }
+    );
     res.status(202).json({ message: `Topic with ${id} downVoted.` });
   } catch (error) {
     res.status(500).json(err);
@@ -274,13 +282,13 @@ router.put("/topic/:id/canceldownvote", isLoggedIn, async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    await Topic.findByIdAndUpdate(
-      id,
-      { $inc: { vote: +1 } },
-      { new: true }
-    )
+    await Topic.findByIdAndUpdate(id, { $inc: { vote: +1 } }, { new: true });
 
-    await User.findByIdAndUpdate(userId, { $pull: {downVotes: id}}, {new: true})
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { downVotes: id } },
+      { new: true }
+    );
     res.status(202).json({ message: `Topic with ${id} downVoted.` });
   } catch (error) {
     res.status(500).json(err);
